@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx_proxy_manager
+    restart: unless-stopped
+    ports:
+      - '80:80'   # Puerto web estándar para tu intranet 
+      - '81:81'   # Panel de administración visual de Nginx
+      - '443:443' # Puerto HTTPS seguro para Let's Encrypt
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt

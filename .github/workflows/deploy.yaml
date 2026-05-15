@@ -1,0 +1,34 @@
+name: Despliegue de Nginx Base (Asistente Jarvis)
+
+on:
+  push:
+    branches: [ develop ] # El pipeline se activa automáticamente al hacer push a develop
+
+jobs:
+  deploy-infrastructure:
+    runs-on: self-hosted # GitHub Actions le envía el trabajo directamente a tu máquina local
+    steps:
+      - name: Descargar repositorio de infraestructura
+        uses: actions/checkout@v4
+
+      - name: Preparar carpeta de Nginx en la Intranet
+        run: |
+          # Jarvis crea su propio directorio dentro de la ruta asignada sin requerir sudo
+          mkdir -p /var/www/intranet/nginx-base
+          
+      - name: Sincronizar archivo docker-compose.yml
+        run: |
+          # Sincroniza el docker-compose.yml del repositorio a la carpeta definitiva
+          cp docker-compose.yml /var/www/intranet/nginx-base/
+
+      - name: Levantar Infraestructura Nginx con Docker Compose
+        working-directory: /var/www/intranet/nginx-base
+        run: |
+          # Levanta o actualiza los contenedores de forma aislada
+          docker compose up -d
+
+      - name: Confirmar ejecución exitosa
+        run: |
+          # Pausa de seguridad y verificación de que el contenedor quedó corriendo
+          sleep 5
+          docker ps | grep nginx_proxy_manager
